@@ -48,13 +48,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
     await update.message.reply_html(
-        rf"Hi {user.mention_html()}!",
-        reply_markup=ForceReply(selective=True),
+        rf"Hi {user.mention_html()}! Use /help command for usage.",
     )
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
-    await update.message.reply_text("Help!")
+    await update.message.reply_html(
+        """The bot expects to receive two images in one message and sends result of <a href="https://en.wikipedia.org/wiki/Neural_style_transfer">NST</a> in return. The first image will be used as a content image, the second - as a style one."""
+        )
 
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
