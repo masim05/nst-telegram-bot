@@ -35,6 +35,8 @@ if __version_info__ < (20, 0, 0, "alpha", 1):
 from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, ApplicationBuilder
 
+IMAGE_FOLDER="images"
+
 # Enable logging
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -64,7 +66,18 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def nst(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Perform NST using images in the message."""
+    file_path = await download_image(update, context)
     await update.message.reply_text("NST triggered")
+
+async def download_image(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+    """Helper for downloading images"""
+    bot = context.bot
+    image = await bot.getFile(update.message.photo[-1].file_id)
+    extenstion = os.path.splitext(image.file_path)[-1]
+    file_path = f"{IMAGE_FOLDER}/{image.file_unique_id}{extenstion}"
+    await image.download_to_drive(custom_path=file_path)
+    return file_path
+
 
 def main() -> None:
     """Start the bot."""
