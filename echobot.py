@@ -62,6 +62,9 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
     await update.message.reply_text(update.message.text)
 
+async def nst(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Perform NST using images in the message."""
+    await update.message.reply_text("NST triggered")
 
 def main() -> None:
     """Start the bot."""
@@ -73,8 +76,11 @@ def main() -> None:
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
 
-    # on non command i.e message - echo the message on Telegram
+    # on non command text messages - echo the message on Telegram
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+
+    # on messages containing an image - perform NST
+    application.add_handler(MessageHandler(filters.PHOTO, nst))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling()
