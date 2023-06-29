@@ -29,18 +29,17 @@ if __version_info__ < (20, 0, 0, "alpha", 1):
     raise RuntimeError(
         f"This example is not compatible with your current PTB version {TG_VER}. To view the "
         f"{TG_VER} version of this example, "
-        f"visit https://docs.python-telegram-bot.org/en/v{TG_VER}/examples.html"
-    )
+        f"visit https://docs.python-telegram-bot.org/en/v{TG_VER}/examples.html")
 
 from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, ApplicationBuilder
 
-IMAGE_FOLDER="images"
+IMAGE_FOLDER = "images"
 
 # Enable logging
 logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
-)
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -53,21 +52,24 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         rf"Hi {user.mention_html()}! Use /help command for usage.",
     )
 
+
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
     await update.message.reply_html(
         """The bot expects to receive two images and sends result of <a href="https://en.wikipedia.org/wiki/Neural_style_transfer">NST</a> in return. The first image will be used as a content image, the second - as a style one."""
-        )
+    )
 
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
     await update.message.reply_text(update.message.text)
 
+
 async def nst(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Perform NST using images in the message."""
     file_path = await download_image(update, context)
     await update.message.reply_text("NST triggered")
+
 
 async def download_image(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Helper for downloading images"""
@@ -90,7 +92,10 @@ def main() -> None:
     application.add_handler(CommandHandler("help", help_command))
 
     # on non command text messages - echo the message on Telegram
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+    application.add_handler(
+        MessageHandler(
+            filters.TEXT & ~filters.COMMAND,
+            echo))
 
     # on messages containing an image - perform NST
     application.add_handler(MessageHandler(filters.PHOTO, nst))
