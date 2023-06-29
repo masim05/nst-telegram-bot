@@ -34,13 +34,67 @@ if __version_info__ < (20, 0, 0, "alpha", 1):
 from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, ApplicationBuilder
 
-IMAGE_FOLDER = "images"
 
 # Enable logging
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+IMAGE_FOLDER = "images"
+logger.info(f"Using IMAGE_FOLDER={IMAGE_FOLDER}.")
+
+
+NST_REQUEST_NEW = "NEW"
+NST_REQUEST_CONTENT_IMAGE_ASSIGNED = "CONTENT_IMAGE_ASSIGNED"
+NST_REQUEST_STYLE_IMAGE_ASSIGNED = "STYLE_IMAGE_ASSIGNED"
+NST_REQUEST_IN_TRANSFER = "IN_TRANSFER"
+NST_REQUEST_DONE = "DONE"
+
+
+class NSTRequest():
+    status = NST_REQUEST_NEW
+    content_image_path = ""
+    style_image_path = ""
+    generated_image_path = ""
+
+    async def assign_image(self, image_path) -> None:
+        print("assign_image")
+        if not self.is_eligible_for_image_assignment():
+            raise RuntimeError("assign_image was called when not eligible")
+
+        if self.status == NST_REQUEST_NEW:
+            self.content_image_path = image_path
+            self.status = NST_REQUEST_CONTENT_IMAGE_ASSIGNED
+
+        elif self.status == NST_REQUEST_CONTENT_IMAGE_ASSIGNED:
+            self.style_image_path = image_path
+            self.status = NST_REQUEST_STYLE_IMAGE_ASSIGNED
+            await self.transfer_style()
+
+    async def transfer_style(self):
+        print("transfer_style")
+        if self.status != NST_REQUEST_STYLE_IMAGE_ASSIGNED:
+            raise RuntimeError(
+                "transfer_style was called on not NST_REQUEST_STYLE_IMAGE_ASSIGNED")
+        self.status = NST_REQUEST_IN_TRANSFER
+        # do style transfer and assign self.generated_image_path
+
+    def get_generated_image_path(self) -> str:
+        print("get_generated_image_path")
+        if self.status != NST_REQUEST_DONE:
+            raise RuntimeError(
+                "transfer_style was called on not NST_REQUEST_DONE")
+        return self.generated_image_path
+
+    def is_eligible_for_image_assignment(self) -> bool:
+        print("get_generated_image_path")
+        return (self.status == NST_REQUEST_NEW) or (
+            self.status == NST_REQUEST_CONTENT_IMAGE_ASSIGNED)
+
+
+USERS_REQUESTS = {}
 
 
 # Define a few command handlers. These usually take the two arguments update and
@@ -67,8 +121,19 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def nst(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Perform NST using images in the message."""
-    file_path = await download_image(update, context)
-    await update.message.reply_text("NST triggered")
+    image_path = await download_image(update, context)
+    key = update.effective_user.id
+
+    if not USERS_REQUESTS.get(key):
+        USERS_REQUESTS[key] = [NSTRequest()]
+
+    if not USERS_REQUESTS.get(key)[-1].is_eligible_for_image_assignment():
+        USERS_REQUESTS[key].append(NSTRequest())
+
+    last_eligible_user_request = USERS_REQUESTS[key][-1]
+    await last_eligible_user_request.assign_image(image_path)
+
+    await update.message.reply_text(f"Your request is in {last_eligible_user_request.status} status")
 
 
 async def download_image(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
