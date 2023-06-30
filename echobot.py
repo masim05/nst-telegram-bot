@@ -181,8 +181,8 @@ class NSTRequest():
 
                 save_image(generated_image, self.generated_image_path)
 
-            save_image(generated_image, self.generated_image_path)
-            self.status = NST_REQUEST_DONE
+        save_image(generated_image, self.generated_image_path)
+        self.status = NST_REQUEST_DONE
 
     def get_generated_image_path(self) -> str:
         if not self.is_done():
