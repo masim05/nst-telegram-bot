@@ -43,7 +43,6 @@ import torch.nn as nn
 from PIL import Image
 import torchvision.transforms as transforms
 import torch
-IMAGE_SIZE = os.getenv('IMAGE_SIZE', 128)
 
 # Enable logging
 logging.basicConfig(
@@ -59,11 +58,12 @@ device = torch.device(device_tag)
 IMAGE_FOLDER = "images"
 logger.info(f"Using IMAGE_FOLDER={IMAGE_FOLDER}.")
 
+IMAGE_SIZE = os.getenv('IMAGE_SIZE', 128)
 EPOCHS = os.getenv('EPOCHS', 500)
 LR = os.getenv('LR', 0.004)
 ALPHA = os.getenv('ALPHA', 8)
 BETA = os.getenv('BETA', 70)
-logger.info(f"Using EPOCHS={EPOCHS}, LR={LR}, ALPHA={ALPHA}, BETA={BETA}.")
+logger.info(f"Using IMAGE_SIZE={IMAGE_SIZE}, EPOCHS={EPOCHS}, LR={LR}, ALPHA={ALPHA}, BETA={BETA}.")
 
 
 def calc_content_loss(gen_feat, orig_feat):
