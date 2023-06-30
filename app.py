@@ -58,11 +58,11 @@ device = torch.device(device_tag)
 IMAGE_FOLDER = "images"
 logger.info(f"Using IMAGE_FOLDER={IMAGE_FOLDER}.")
 
-IMAGE_SIZE = os.getenv('IMAGE_SIZE', 128)
-EPOCHS = os.getenv('EPOCHS', 500)
-LR = os.getenv('LR', 0.004)
-ALPHA = os.getenv('ALPHA', 8)
-BETA = os.getenv('BETA', 70)
+IMAGE_SIZE = int(os.getenv('IMAGE_SIZE', 128))
+EPOCHS = int(os.getenv('EPOCHS', 500))
+LR = float(os.getenv('LR', 0.004))
+ALPHA = float(os.getenv('ALPHA', 8))
+BETA = float(os.getenv('BETA', 70))
 logger.info(f"Using IMAGE_SIZE={IMAGE_SIZE}, EPOCHS={EPOCHS}, LR={LR}, ALPHA={ALPHA}, BETA={BETA}.")
 
 
@@ -223,8 +223,12 @@ class VGG(nn.Module):
 # preprocessing
 def image_loader(path):
     image = Image.open(path)
-    loader = transforms.Compose([transforms.CenterCrop(
-        (IMAGE_SIZE, IMAGE_SIZE)), transforms.ToTensor()])
+    size = min(image.size)
+    loader = transforms.Compose([
+        transforms.CenterCrop(size),
+        transforms.Resize((IMAGE_SIZE, IMAGE_SIZE)),
+        transforms.ToTensor()
+    ])
     image = loader(image).unsqueeze(0)
     return image.to(device, torch.float)
 
