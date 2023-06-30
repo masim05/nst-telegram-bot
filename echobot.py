@@ -187,7 +187,7 @@ class NSTRequest():
     def get_generated_image_path(self) -> str:
         if not self.is_done():
             raise RuntimeError(
-                "transfer_style was called on not NST_REQUEST_DONE")
+                "get_generated_image_path was called on not NST_REQUEST_DONE")
         return self.generated_image_path
 
     def is_eligible_for_image_assignment(self) -> bool:
