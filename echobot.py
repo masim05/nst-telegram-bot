@@ -279,7 +279,7 @@ async def nst(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not last_eligible_user_request.is_eligible_for_transfer():
         return
 
-    await update.message.reply_text(f"Strating NST, it may take a while...")
+    await update.message.reply_text(f"Starting NST, it may take a while...")
     await last_eligible_user_request.transfer_style()
     generated_image_path = last_eligible_user_request.get_generated_image_path()
     await update.message.reply_photo(generated_image_path)
