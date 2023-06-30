@@ -271,17 +271,17 @@ async def nst(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not USERS_REQUESTS.get(key)[-1].is_eligible_for_image_assignment():
         USERS_REQUESTS[key].append(NSTRequest())
 
-    last_eligible_user_request = USERS_REQUESTS[key][-1]
-    await last_eligible_user_request.assign_image(image_path)
+    last_user_request = USERS_REQUESTS[key][-1]
+    await last_user_request.assign_image(image_path)
 
-    await update.message.reply_text(f"Your request is in {last_eligible_user_request.status} status")
+    await update.message.reply_text(f"Your request is in {last_user_request.status} status")
 
-    if not last_eligible_user_request.is_eligible_for_transfer():
+    if not last_user_request.is_eligible_for_transfer():
         return
 
     await update.message.reply_text(f"Starting NST, it may take a while...")
-    await last_eligible_user_request.transfer_style()
-    generated_image_path = last_eligible_user_request.get_generated_image_path()
+    await last_user_request.transfer_style()
+    generated_image_path = last_user_request.get_generated_image_path()
     await update.message.reply_photo(generated_image_path)
 
 
