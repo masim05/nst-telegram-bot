@@ -219,7 +219,7 @@ class VGG(nn.Module):
         return features
 
 
-# defing a function that will load the image and perform the required
+# define a function that will load the image and perform the required
 # preprocessing
 def image_loader(path):
     image = Image.open(path)
