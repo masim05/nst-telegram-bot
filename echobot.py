@@ -103,7 +103,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
     await update.message.reply_html(
-        rf"Hi {user.mention_html()}! Use /help command for usage. Use /params command for checking parameters.",
+        rf"Hi {user.mention_html()}! Use /help command for usage. Use /debug command for checking parameters.",
     )
 
 
@@ -113,9 +113,9 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         """The bot expects to receive two images and sends result of <a href="https://en.wikipedia.org/wiki/Neural_style_transfer">NST</a> in return. The first image will be used as a content image, the second - as a style one."""
     )
 
-async def params_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Send a message when the command /params is issued."""
-    await update.message.reply_text(f"IMAGE_SIZE={IMAGE_SIZE}")
+async def debug_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Send a message when the command /debug is issued."""
+    await update.message.reply_text(f"IMAGE_SIZE={IMAGE_SIZE}, USERS_REQUESTS={USERS_REQUESTS}")
 
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -159,7 +159,7 @@ def main() -> None:
     # on different commands - answer in Telegram
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
-    application.add_handler(CommandHandler("params", params_command))
+    application.add_handler(CommandHandler("debug", debug_command))
 
     # on non command text messages - echo the message on Telegram
     application.add_handler(
