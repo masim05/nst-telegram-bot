@@ -128,6 +128,9 @@ class NSTRequest():
     style_image_path = ""
     generated_image_path = ""
 
+    def __repr__(self) -> str:
+        return f"""status={self.status}, content_image_path={self.content_image_path}, style_image_path={self.style_image_path}, generated_image_path={self.generated_image_path}\n"""
+
     async def assign_image(self, image_path) -> None:
         if not self.is_eligible_for_image_assignment():
             raise RuntimeError("assign_image was called when not eligible")
