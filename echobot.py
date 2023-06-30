@@ -174,7 +174,7 @@ class NSTRequest():
 
             # print the image and save it after each 100 epoch
             if (not (e % 100)):
-                print(total_loss)
+                logger.info(total_loss)
 
                 save_image(generated_image, self.generated_image_path)
 
@@ -182,23 +182,19 @@ class NSTRequest():
             self.status = NST_REQUEST_DONE
 
     def get_generated_image_path(self) -> str:
-        print("get_generated_image_path")
         if not self.is_done():
             raise RuntimeError(
                 "transfer_style was called on not NST_REQUEST_DONE")
         return self.generated_image_path
 
     def is_eligible_for_image_assignment(self) -> bool:
-        print("is_eligible_for_image_assignment")
         return (self.status == NST_REQUEST_NEW) or (
             self.status == NST_REQUEST_CONTENT_IMAGE_ASSIGNED)
 
     def is_done(self) -> bool:
-        print("is_done")
         return self.status == NST_REQUEST_DONE
 
     def is_eligible_for_transfer(self) -> bool:
-        print("is_eligible_for_transfer")
         return self.status == NST_REQUEST_STYLE_IMAGE_ASSIGNED
 
 
