@@ -36,6 +36,7 @@ The bot expects to receive two images and sends result of <a href="https://en.wi
 
 With parameters: `IMAGE_SIZE=256, EPOCHS=500, LR=0.005, ALPHA=10.0, BETA=60.0`
 ![](./assets/nst_2.png)
+![](./assets/nst_3.png)
 
 # TODO
  - [x] Share the code on github
