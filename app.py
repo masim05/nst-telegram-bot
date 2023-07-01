@@ -284,7 +284,8 @@ async def nst(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         if not last_user_request.is_eligible_for_transfer():
             return
 
-        await update.message.reply_text(f"Starting NST, it may take a while...")
+        # Production lives on old 4 cores laptop, so it takes time
+        await update.message.reply_text(f"NST queued, it may take upto 3 hours once started...")
         with concurrent.futures.ProcessPoolExecutor() as pool:
             generated_image_path = await loop.run_in_executor(
                 pool, last_user_request.transfer_style)
