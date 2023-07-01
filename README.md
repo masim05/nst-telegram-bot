@@ -31,6 +31,12 @@ Available commands:
 
 The bot expects to receive two images and sends result of <a href="https://en.wikipedia.org/wiki/Neural_style_transfer">NST</a> in return. The first image will be used as a content image, the second - as a style one.
 
+# Results
+![](./assets/nst_1.gif)
+
+With parameters: `IMAGE_SIZE=256, EPOCHS=500, LR=0.005, ALPHA=10.0, BETA=60.0`
+![](./assets/nst_2.png)
+
 # Credits
  - https://docs.python-telegram-bot.org/en/stable/examples.echobot.html
  - https://towardsdatascience.com/implementing-neural-style-transfer-using-pytorch-fd8d43fb7bfa
