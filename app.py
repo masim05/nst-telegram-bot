@@ -130,7 +130,7 @@ class NSTRequest():
     def __repr__(self) -> str:
         return f"""status={self.status}, content_image_path={self.content_image_path}, style_image_path={self.style_image_path}, generated_image_path={self.generated_image_path}\n"""
 
-    async def assign_image(self, image_path) -> None:
+    def assign_image(self, image_path) -> None:
         if not self.is_eligible_for_image_assignment():
             raise RuntimeError("assign_image was called when not eligible")
 
@@ -275,8 +275,8 @@ async def nst(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         USERS_REQUESTS[key].append(NSTRequest())
 
     last_user_request = USERS_REQUESTS[key][-1]
-    await last_user_request.assign_image(image_path)
 
+    last_user_request.assign_image(image_path)
     await update.message.reply_text(f"Your request is in {last_user_request.status} status")
 
     if not last_user_request.is_eligible_for_transfer():
