@@ -37,6 +37,16 @@ The bot expects to receive two images and sends result of <a href="https://en.wi
 With parameters: `IMAGE_SIZE=256, EPOCHS=500, LR=0.005, ALPHA=10.0, BETA=60.0`
 ![](./assets/nst_2.png)
 
+# TODO
+ - [x] Share the code on github
+ - [x] Prepare README file
+ - [x] Implement the main flow
+ - [x] Dockerize
+ - [x] Deploy and run
+ - [ ] Implement in non-blocking manner
+ - [ ] Implement `/transfer_style` command
+ - [ ] Re-train models
+
 # Credits
  - https://docs.python-telegram-bot.org/en/stable/examples.echobot.html
  - https://towardsdatascience.com/implementing-neural-style-transfer-using-pytorch-fd8d43fb7bfa
