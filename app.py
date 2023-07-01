@@ -18,6 +18,10 @@ bot.
 import logging
 import os
 import uuid
+import asyncio
+import concurrent.futures
+
+lock = asyncio.Lock()
 
 from telegram import __version__ as TG_VER
 
@@ -142,7 +146,7 @@ class NSTRequest():
             self.style_image_path = image_path
             self.status = NST_REQUEST_STYLE_IMAGE_ASSIGNED
 
-    async def transfer_style(self) -> None:
+    def transfer_style(self) -> str:
         if not self.is_eligible_for_transfer():
             raise RuntimeError(
                 "transfer_style was called on not NST_REQUEST_STYLE_IMAGE_ASSIGNED")
@@ -183,10 +187,6 @@ class NSTRequest():
         save_image(generated_image, self.generated_image_path)
         self.status = NST_REQUEST_DONE
 
-    def get_generated_image_path(self) -> str:
-        if not self.is_done():
-            raise RuntimeError(
-                "get_generated_image_path was called on not NST_REQUEST_DONE")
         return self.generated_image_path
 
     def is_eligible_for_image_assignment(self) -> bool:
@@ -265,27 +265,31 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def nst(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Perform NST using images in the message."""
-    image_path = await download_image(update, context)
-    key = update.effective_user.id
+    loop = asyncio.get_running_loop()
+    async with lock:
+        image_path = await download_image(update, context)
+        key = update.effective_user.id
 
-    if not USERS_REQUESTS.get(key):
-        USERS_REQUESTS[key] = [NSTRequest()]
+        if not USERS_REQUESTS.get(key):
+            USERS_REQUESTS[key] = [NSTRequest()]
 
-    if not USERS_REQUESTS.get(key)[-1].is_eligible_for_image_assignment():
-        USERS_REQUESTS[key].append(NSTRequest())
+        if not USERS_REQUESTS.get(key)[-1].is_eligible_for_image_assignment():
+            USERS_REQUESTS[key].append(NSTRequest())
 
-    last_user_request = USERS_REQUESTS[key][-1]
+        last_user_request = USERS_REQUESTS[key][-1]
 
-    last_user_request.assign_image(image_path)
-    await update.message.reply_text(f"Your request is in {last_user_request.status} status")
+        last_user_request.assign_image(image_path)
+        await update.message.reply_text(f"Your request is in {last_user_request.status} status")
 
-    if not last_user_request.is_eligible_for_transfer():
-        return
+        if not last_user_request.is_eligible_for_transfer():
+            return
 
-    await update.message.reply_text(f"Starting NST, it may take a while...")
-    await last_user_request.transfer_style()
-    generated_image_path = last_user_request.get_generated_image_path()
-    await update.message.reply_photo(generated_image_path)
+        await update.message.reply_text(f"Starting NST, it may take a while...")
+        with concurrent.futures.ProcessPoolExecutor() as pool:
+            generated_image_path = await loop.run_in_executor(
+                pool, last_user_request.transfer_style)
+
+        await update.message.reply_photo(generated_image_path)
 
 
 async def download_image(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
@@ -316,7 +320,7 @@ def main() -> None:
             echo))
 
     # on messages containing an image - perform NST
-    application.add_handler(MessageHandler(filters.PHOTO, nst))
+    application.add_handler(MessageHandler(filters.PHOTO, nst, block=False))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling()
