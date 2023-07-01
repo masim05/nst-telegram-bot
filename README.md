@@ -7,7 +7,7 @@ Docker
 git clone https://github.com/masim05/nst-telegram-bot.git
 cd nst-telegram-bot
 docker build -t nst-telegram-bot .
-docker run -d -e TG_BOT_TOKEN=<YOUR_TOKEN> nst-telegram-bot
+docker run -d -e TG_BOT_TOKEN=<YOUR_TOKEN> -e IMAGE_SIZE=256 -e EPOCHS=500 -e LR=0.005 -e ALPHA=10  -e BETA=60 nst-telegram-bot
 ```
 
 Native, tested with python 3.11.4
