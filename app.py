@@ -21,6 +21,7 @@ import uuid
 import asyncio
 import concurrent.futures
 import platform
+from datetime import datetime
 
 lock = asyncio.Lock()
 
@@ -131,6 +132,10 @@ class NSTRequest():
     content_image_path = ""
     style_image_path = ""
     generated_image_path = ""
+    created_at = ""
+
+    def __init__(self):
+        self.created_at = f"{datetime.now()}"
 
     def __repr__(self) -> str:
         return f"""status={self.status}, content_image_path={self.content_image_path}, style_image_path={self.style_image_path}, generated_image_path={self.generated_image_path}\n"""
