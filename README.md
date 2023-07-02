@@ -31,6 +31,8 @@ Available commands:
 
 The bot expects to receive two images and sends result of <a href="https://en.wikipedia.org/wiki/Neural_style_transfer">NST</a> in return. The first image will be used as a content image, the second - as a style one.
 
+At the moment only one NST requests can be processes at a time due to hardware limitations of the hosting server. However, during NST other commands (eg, `/debug`) work.
+
 # Results
 ![](./assets/nst_1.gif)
 
@@ -44,7 +46,7 @@ With parameters: `IMAGE_SIZE=256, EPOCHS=500, LR=0.005, ALPHA=10.0, BETA=60.0`
  - [x] Implement the main flow
  - [x] Dockerize
  - [x] Deploy and run
- - [ ] Implement in non-blocking manner
+ - [x] Implement in non-blocking manner
  - [ ] Implement `/transfer_style` command
  - [ ] Re-train models
 
