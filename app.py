@@ -261,7 +261,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 async def debug_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /debug is issued."""
     await update.message.reply_text(f"""NODE={platform.uname().node}, IMAGE_SIZE={IMAGE_SIZE}, EPOCHS={EPOCHS}, LR={LR}, ALPHA={ALPHA}, BETA={BETA},
-USERS_REQUESTS={USERS_REQUESTS[-4:]}""")
+USERS_REQUESTS={USERS_REQUESTS}""")
 
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
