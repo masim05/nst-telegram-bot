@@ -20,6 +20,7 @@ import os
 import uuid
 import asyncio
 import concurrent.futures
+import platform
 
 lock = asyncio.Lock()
 
@@ -254,7 +255,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 async def debug_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /debug is issued."""
-    await update.message.reply_text(f"""IMAGE_SIZE={IMAGE_SIZE}, EPOCHS={EPOCHS}, LR={LR}, ALPHA={ALPHA}, BETA={BETA},
+    await update.message.reply_text(f"""NODE={platform.uname().node}, IMAGE_SIZE={IMAGE_SIZE}, EPOCHS={EPOCHS}, LR={LR}, ALPHA={ALPHA}, BETA={BETA},
 USERS_REQUESTS={USERS_REQUESTS}""")
 
 
@@ -265,6 +266,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def nst(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Perform NST using images in the message."""
+    await update.message.reply_text(f"Your image received.")
     loop = asyncio.get_running_loop()
     async with lock:
         image_path = await download_image(update, context)
@@ -279,13 +281,13 @@ async def nst(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         last_user_request = USERS_REQUESTS[key][-1]
 
         last_user_request.assign_image(image_path)
-        await update.message.reply_text(f"Your request is in {last_user_request.status} status")
+        await update.message.reply_text(f"Your request is in {last_user_request.status} status.")
 
         if not last_user_request.is_eligible_for_transfer():
             return
 
         # Production lives on old 4 cores laptop, so it takes time
-        await update.message.reply_text(f"NST queued, it may take upto 3 hours once started...")
+        await update.message.reply_text(f"NST has been queued, it may take upto 3 hours once started...")
         with concurrent.futures.ProcessPoolExecutor() as pool:
             generated_image_path = await loop.run_in_executor(
                 pool, last_user_request.transfer_style)
