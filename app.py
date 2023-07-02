@@ -271,7 +271,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def nst(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Perform NST using images in the message."""
-    await update.message.reply_text(f"Your image received.")
+    await update.message.reply_text("Your image received, queued for processing.")
     loop = asyncio.get_running_loop()
     async with lock:
         image_path = await download_image(update, context)
@@ -292,7 +292,7 @@ async def nst(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             return
 
         # Production lives on old 4 cores laptop, so it takes time
-        await update.message.reply_text(f"NST has been queued, it may take upto 3 hours once started...")
+        await update.message.reply_text("NST is starting, it may take upto 3 hours...")
         with concurrent.futures.ProcessPoolExecutor() as pool:
             generated_image_path = await loop.run_in_executor(
                 pool, last_user_request.transfer_style)
