@@ -239,12 +239,22 @@ def image_loader(path):
 
 
 USERS_REQUESTS = {}
+ACCESS_LOG = {}
+
+def log_access(update: Update):
+    user = update.effective_user
+    key = user.id
+    if not ACCESS_LOG.get(key):
+        ACCESS_LOG[key] = {"id": key, "name": user.username, "time": f"{datetime.now()}"}
+
+    ACCESS_LOG[key]["time"] = f"{datetime.now()}"
 
 
 # Define a few command handlers. These usually take the two arguments update and
 # context.
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
+    log_access(update)
     user = update.effective_user
     await update.message.reply_html(
         rf"Hi {user.mention_html()}! Use /help command for usage. Use /debug command for checking parameters.",
@@ -253,6 +263,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
+    log_access(update)
     await update.message.reply_html(
         """The bot expects to receive two images and sends result of <a href="https://en.wikipedia.org/wiki/Neural_style_transfer">NST</a> in return. The first image will be used as a content image, the second - as a style one."""
     )
@@ -260,17 +271,37 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 async def debug_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /debug is issued."""
+    log_access(update)
+    key = update.effective_user.id
+    requests = USERS_REQUESTS.get(key) or []
+    requests = requests[-2:]
+
     await update.message.reply_text(f"""NODE={platform.uname().node}, IMAGE_SIZE={IMAGE_SIZE}, EPOCHS={EPOCHS}, LR={LR}, ALPHA={ALPHA}, BETA={BETA},
-USERS_REQUESTS={USERS_REQUESTS}""")
+two last requests: {requests}""")
+
+
+MY_TG_IDS = [369850467, 5750392673]
+
+async def access_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Send a message when the command /debug is issued."""
+    log_access(update)
+    key = update.effective_user.id
+    if not key in MY_TG_IDS:
+        await update.message.reply_text("Not allowed.")
+        return
+
+    await update.message.reply_text(f"ACCESS_LOG={ACCESS_LOG}")
 
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
+    log_access(update)
     await update.message.reply_text(update.message.text)
 
 
 async def nst(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Perform NST using images in the message."""
+    log_access(update)
     await update.message.reply_text("Your image received, queued for processing.")
     loop = asyncio.get_running_loop()
     async with lock:
@@ -320,6 +351,7 @@ def main() -> None:
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("debug", debug_command))
+    application.add_handler(CommandHandler("access", access_command))
 
     # on non command text messages - echo the message on Telegram
     application.add_handler(
