@@ -1,6 +1,9 @@
 # nst-telegram-bot
 A telegram bot providing neural style transfer service.
 
+# Try it
+ https://t.me/YetAnotherOneNSTBot
+
 # Setup
 Docker
 ```bash
